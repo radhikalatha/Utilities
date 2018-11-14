@@ -16,7 +16,7 @@ import com.google.common.base.Splitter;
 
 public class StringAccumalator {
 
-	public static void main(String[] args) {		
+	public static void main(String[] args) throws Exception {		
 		String input = "1,2\n45";		
 		add(input);
 	}
@@ -27,12 +27,16 @@ public class StringAccumalator {
 	 * 
 	 * @param numbers
 	 * @return sum of numbers as String
+	 * @throws Exception 
 	 */
-	public static String add(String numbers){	
+	public static String add(String numbers) throws Exception{	
+		String negativeNumber = "";
 		try {		
 	
 			// Considered BigInteger for unlimited length of numbers to sum
-			BigInteger sum = new BigInteger("0");
+			BigInteger sum = BigInteger.ZERO;
+			BigInteger elementBig = BigInteger.ZERO;
+	
 			
 			// Default delimiter
 			String delimiter = ",\n";	
@@ -52,14 +56,21 @@ public class StringAccumalator {
 			Iterable<String> tokens = niceAnyCharSplitter.split(numbers);
 			
 			// Loop through each token number to sum 
-			for(String element : tokens) {
-				sum = sum.add(new BigInteger(element));
-			}				
+			for(String element : tokens) {				
+				elementBig = new BigInteger(element);
+				if(elementBig.signum() == -1) {
+					negativeNumber = negativeNumber + " " + elementBig.toString();					
+				}
+				sum = sum.add(((new BigInteger(element).intValue() > 1000) ? BigInteger.ZERO : elementBig));
+			}
+			if(negativeNumber.length() > 0) {
+				throw new NumberFormatException("Negative numbers not allowed " + negativeNumber);
+			}
 			return sum.toString();
 		}catch(NumberFormatException nexception) {
-			return null;
+			throw new NumberFormatException("Negative numbers not allowed " + negativeNumber);
 		}catch(Exception exception) {
-			return null;
+			throw exception;
 		}
 	}
 		
